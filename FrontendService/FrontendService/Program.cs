@@ -1,7 +1,12 @@
+using FrontendService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();  // Registers the HttpClient
+builder.Services.AddScoped<IBackendServiceClient, BackendServiceClient>();
+
 
 var app = builder.Build();
 
