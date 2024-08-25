@@ -1,20 +1,21 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using PostService.Data;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<PostServiceContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("PostServiceContext") ?? throw new InvalidOperationException("Connection string 'PostServiceContext' not found.")));
-
-// Add services to the container.
-
+builder.Services.AddDbContext<PostServiceContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PostDB")));
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//Apply pending migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PostServiceContext>();
+    dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
