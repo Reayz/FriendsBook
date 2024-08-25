@@ -9,7 +9,6 @@ namespace UserService.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private static readonly HashSet<string> BlacklistedTokens = new HashSet<string>();
 
         public AuthController(IAuthService authService)
         {
@@ -17,14 +16,14 @@ namespace UserService.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> Login([FromBody] Login loginModel)
         {
-            if (loginModel == null || string.IsNullOrEmpty(loginModel.Username) || string.IsNullOrEmpty(loginModel.Password))
+            if (loginModel == null || string.IsNullOrEmpty(loginModel.UserName) || string.IsNullOrEmpty(loginModel.Password))
             {
                 return BadRequest("Invalid client request");
             }
 
-            var token = await _authService.AuthenticateAsync(loginModel.Username, loginModel.Password);
+            var token = await _authService.AuthenticateAsync(loginModel.UserName, loginModel.Password);
 
             if (token == null)
             {
@@ -40,7 +39,9 @@ namespace UserService.Controllers
             var claimsPrincipal = _authService.ValidateJwtToken(token);
 
             if (claimsPrincipal == null)
+            {
                 return Unauthorized();
+            }
 
             return Ok(new { message = "Token is valid", user = claimsPrincipal.Identity.Name });
         }
@@ -48,20 +49,19 @@ namespace UserService.Controllers
         [HttpPost("logout")]
         public IActionResult Logout(string token)
         {
-            // Validate input
             if (string.IsNullOrEmpty(token))
             {
                 return BadRequest("Token is empty.");
             }
 
-            if (BlacklistedTokens.Contains(token))
+            bool success = _authService.Logout(token);
+
+            if (success)
             {
-                return BadRequest("Failed to log out."); // Token is already blacklisted
+                return Ok("Logout successful.");
             }
 
-            BlacklistedTokens.Add(token);
-
-            return Ok("Logout successful.");
+            return BadRequest("Failed to logout.");
         }
     }
 }

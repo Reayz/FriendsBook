@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  userservice:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    image: userservice
+    ports:
+      - "5080:80"
+      - "5443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings:UserDB=Server=sql_server;Database=UserDB;Encrypt=False;User Id=sa;Password=Enosis123!;
+    volumes:
+      - ./UserService/logs:/app/logs
+    depends_on:
+      - sql_server
+    networks:
+      - my_network
+
+  postservice:
+    build:
+      context: ./PostService
+      dockerfile: Dockerfile
+    image: postservice
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings:PostDB=Server=sql_server;Database=PostDB;Encrypt=False;User Id=sa;Password=Enosis123!;
+    volumes:
+      - ./PostService/logs:/app/logs
+    depends_on:
+      - sql_server
+    networks:
+      - my_network
+
+  sql_server:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sql_server
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Enosis123!
+    volumes:
+      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/data:/var/opt/mssql/data"
+      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/log:/var/opt/mssql/log"
+      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/secrets:/var/opt/mssql/secrets"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge

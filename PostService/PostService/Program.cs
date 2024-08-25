@@ -10,11 +10,11 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 //Apply pending migrations on startup
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<PostServiceContext>();
-    dbContext.Database.Migrate();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dbContext = scope.ServiceProvider.GetRequiredService<PostServiceContext>();
+//    dbContext.Database.Migrate();
+//}
 
 if (app.Environment.IsDevelopment())
 {

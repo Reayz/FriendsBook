@@ -58,6 +58,12 @@ namespace FrontendService.Controllers
                         });
 
                         string tempToken = token.Token;
+
+                        Response.Cookies.Append("UserName", model.Username, new CookieOptions
+                        {
+                            Expires = DateTimeOffset.UtcNow.AddDays(1)
+                        });
+
                         return RedirectToAction("Index", "Home");
                     }
                 }
@@ -119,7 +125,7 @@ namespace FrontendService.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Index", "Home"); // Token is valid
+                    return RedirectToAction("Index", "Login"); // Token is valid
                 }
             }
             catch (Exception ex)

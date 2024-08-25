@@ -11,15 +11,19 @@ namespace FrontendService.Services
     public class BackendServiceClient : IBackendServiceClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
 
-        public BackendServiceClient(HttpClient httpClient)
+        public BackendServiceClient(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            _configuration = configuration;
         }
+
 
         public async Task<List<PostDTO>> GetDataFromService1Async()
         {
-            var response = await _httpClient.GetAsync("https://localhost:44385/api/Posts");
+            var url = _configuration["MicroServiceUrls:PostServiceUrl"];
+            var response = await _httpClient.GetAsync(url + "api/Posts");
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();

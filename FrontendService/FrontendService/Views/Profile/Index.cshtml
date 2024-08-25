@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Profile";
+}
+
+@model UserDTO
+
+<h1>Profile</h1>
+
+<div class="profile-container">
+    <dl class="row">
+        <dt class="col-sm-3">User ID:</dt>
+        <dd class="col-sm-9">@Model.UserId</dd>
+
+        <dt class="col-sm-3">Username:</dt>
+        <dd class="col-sm-9">@Model.UserName</dd>
+
+        <dt class="col-sm-3">Email:</dt>
+        <dd class="col-sm-9">
+            @(Model.Email != null ? Model.Email : "Not provided")
+        </dd>
+
+        <dt class="col-sm-3">Phone:</dt>
+        <dd class="col-sm-9">
+            @(Model.Phone != null ? Model.Phone : "Not provided")
+        </dd>
+
+        <dt class="col-sm-3">Address:</dt>
+        <dd class="col-sm-9">
+            @(Model.Address != null ? Model.Address : "Not provided")
+        </dd>
+
+        <dt class="col-sm-3">Date of Birth:</dt>
+        <dd class="col-sm-9">
+            @(Model.DOB.HasValue ? Model.DOB.Value.ToString("d") : "Not provided")
+        </dd>
+    </dl>
+</div>
+
+<style>
+    .profile-container {
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+
+        .profile-container dl {
+            margin: 0;
+        }
+
+        .profile-container dt {
+            font-weight: bold;
+        }
+
+        .profile-container dd {
+            margin-bottom: 10px;
+        }
+</style>
