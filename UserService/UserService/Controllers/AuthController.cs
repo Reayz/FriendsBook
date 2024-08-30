@@ -8,10 +8,12 @@ namespace UserService.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(ILogger<AuthController> logger, IAuthService authService)
         {
+            _logger = logger;
             _authService = authService;
         }
 
@@ -37,6 +39,7 @@ namespace UserService.Controllers
         public IActionResult VerifyToken(string token)
         {
             var claimsPrincipal = _authService.ValidateJwtToken(token);
+            _logger.LogInformation($"In the VerifyToken method: {claimsPrincipal?.Identity?.Name}.");
 
             if (claimsPrincipal == null)
             {

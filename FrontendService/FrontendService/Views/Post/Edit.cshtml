@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "Edit Post";
+}
+
+@model PostDTO
+
+<style>
+    .edit-post-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+    }
+
+    .edit-post-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+    .form-control {
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+
+    .btn {
+        padding: 0.75rem 1.25rem;
+        border-radius: 4px;
+        font-size: 1rem;
+        text-align: center;
+        display: inline-block;
+        cursor: pointer;
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #4e555b;
+        }
+
+    .text-danger {
+        color: #dc3545;
+    }
+</style>
+
+<div class="edit-post-container">
+    <h1 class="edit-post-title">Edit Post</h1>
+
+    <form asp-action="Edit" method="post">
+        <div class="form-group">
+            <label asp-for="Title" class="control-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="control-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <input type="hidden" asp-for="PostId" />
+        <input type="hidden" asp-for="AuthorId" />
+        <input type="hidden" asp-for="AuthorName" />
+        <input type="hidden" asp-for="PublishDate" />
+        <input type="hidden" asp-for="LastEditedDate" />
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

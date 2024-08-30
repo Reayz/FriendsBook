@@ -1,5 +1,7 @@
 ﻿using FrontendService.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -10,12 +12,10 @@ namespace FrontendService.Controllers
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 
-
         public LoginController(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration;
-
         }
 
         public IActionResult Index()
@@ -31,8 +31,8 @@ namespace FrontendService.Controllers
             {
                 var loginData = new
                 {
-                    Username = model.Username,
-                    Password = model.Password,
+                    model.Username,
+                    model.Password,
                 };
 
                 var content = new StringContent(JsonSerializer.Serialize(loginData), Encoding.UTF8, "application/json");
@@ -49,22 +49,30 @@ namespace FrontendService.Controllers
                     {
                         PropertyNameCaseInsensitive = true
                     };
+
                     var token = JsonSerializer.Deserialize<TokenResponse>(responseData, options);
                     if (token != null)
                     {
-                        Response.Cookies.Append("Token", token.Token, new CookieOptions
+                        var handler = new JwtSecurityTokenHandler();
+                        var jsonToken = handler.ReadToken(token.Token) as JwtSecurityToken;
+
+                        if (jsonToken != null)
                         {
-                            Expires = DateTimeOffset.UtcNow.AddDays(1)
-                        });
+                            var claims = jsonToken.Claims;
 
-                        string tempToken = token.Token;
+                            var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.UserData)?.Value;
 
-                        Response.Cookies.Append("UserName", model.Username, new CookieOptions
-                        {
-                            Expires = DateTimeOffset.UtcNow.AddDays(1)
-                        });
+                            var cookieOptions = new CookieOptions
+                            {
+                                Expires = DateTimeOffset.UtcNow.AddDays(1)
+                            };
 
-                        return RedirectToAction("Index", "Home");
+                            Response.Cookies.Append("Token", token.Token, cookieOptions);
+                            Response.Cookies.Append("UserName", model.Username, cookieOptions);
+                            Response.Cookies.Append("UserId", userId, cookieOptions);
+
+                            return RedirectToAction("Index", "Home");
+                        }
                     }
                 }
             }
@@ -75,6 +83,11 @@ namespace FrontendService.Controllers
         public async Task<IActionResult> Verify()
         {
             var token = Request.Cookies["Token"];
+
+            if (token == null)
+            {
+                return RedirectToAction("Index");
+            }
 
             var url = _configuration["MicroServiceUrls:UserServiceUrl"];
             var requestUrl = $"{url}api/Auth/verify-token?token={Uri.EscapeDataString(token)}";
@@ -109,6 +122,11 @@ namespace FrontendService.Controllers
         public async Task<IActionResult> Logout()
         {
             var token = Request.Cookies["Token"];
+
+            if (token == null)
+            {
+                return RedirectToAction("Index");
+            }
 
             var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
 

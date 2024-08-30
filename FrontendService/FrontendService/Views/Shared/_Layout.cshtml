@@ -7,51 +7,83 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FrontendService.styles.css" asp-append-version="true" />
+    <style>
+        .navbar-custom {
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .content-wrapper {
+            padding: 20px;
+            overflow-y: auto;
+            height: calc(100vh - 60px);
+        }
+
+        .footer-custom {
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            left: 130px;
+            width: calc(100% - 130px);
+            height: 60px;
+            line-height: 60px;
+            z-index: 1000;
+        }
+
+        .logout-button {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/friends.png" lt="friends icon" width="40" height="40" />
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="Index">Posts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Verify">Verify</a>
-                        </li>
-                        <li class="nav-item ms-auto">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Logout">Logout</a>
-                        </li>
-                    </ul>
+    <div class="page-wrapper">
+        <!-- Left Sidebar Menu -->
+        <nav class="navbar navbar-light navbar-custom flex-column align-items-start p-3">
+            <div>
+                <div class="menu-buttons">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Post" asp-action="Index">
+                        <img src="~/home.png" alt="home icon" width="40" height="40" /> Post
+                    </a>
+                </div>
+                <div class="menu-buttons">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index">
+                        <img src="~/user.png" alt="user icon" width="40" height="40" /> Profile
+                    </a>
                 </div>
             </div>
+            <div class="menu-buttons logout-button">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Logout">
+                    <img src="~/switch.png" alt="logout icon" width="40" height="40" /> Logout
+                </a>
+            </div>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+        <!-- Main Content -->
+        <div class="container-fluid p-3 content-wrapper">
+            <div class="container">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer-custom text-muted">
+            <div class="container">
+                &copy; 2024 - FrontendService
+            </div>
+        </footer>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - FrontendService - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

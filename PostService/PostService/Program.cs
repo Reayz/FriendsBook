@@ -6,6 +6,8 @@ builder.Services.AddDbContext<PostServiceContext>(options => options.UseSqlServe
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
+
 
 var app = builder.Build();
 

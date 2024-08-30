@@ -6,9 +6,10 @@ services:
       context: ./UserService
       dockerfile: Dockerfile
     image: userservice
+    container_name: friendsbook.userservice
     ports:
-      - "5080:80"
-      - "5443:443"
+      - "6080:80"
+      - "6443:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings:UserDB=Server=sql_server;Database=UserDB;Encrypt=False;User Id=sa;Password=Enosis123!;
@@ -24,16 +25,42 @@ services:
       context: ./PostService
       dockerfile: Dockerfile
     image: postservice
+    container_name: friendsbook.postservice
     ports:
       - "8080:80"
       - "8443:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings:PostDB=Server=sql_server;Database=PostDB;Encrypt=False;User Id=sa;Password=Enosis123!;
+      - MicroServiceUrls:UserServiceUrl=http://userservice:80/
     volumes:
       - ./PostService/logs:/app/logs
     depends_on:
       - sql_server
+      - userservice
+    networks:
+      - my_network
+      
+  frontendservice:
+    build:
+      context: ./FrontendService
+      dockerfile: Dockerfile
+    image: frontendservice
+    container_name: friendsbook.frontendservice
+    ports:
+      - "7080:80"
+      - "7443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings:PostDB=Server=sql_server;Database=PostDB;Encrypt=False;User Id=sa;Password=Enosis123!;
+      - MicroServiceUrls:UserServiceUrl=http://userservice:80/
+      - MicroServiceUrls:PostServiceUrl=http://postservice:80/
+    volumes:
+      - ./FrontendService/logs:/app/logs
+    depends_on:
+      - sql_server
+      - userservice
+      - postservice
     networks:
       - my_network
 

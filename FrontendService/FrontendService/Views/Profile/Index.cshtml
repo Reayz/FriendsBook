@@ -4,36 +4,55 @@
 
 @model UserDTO
 
-<h1>Profile</h1>
+<h1>Profile of @Model.UserName</h1>
 
 <div class="profile-container">
-    <dl class="row">
-        <dt class="col-sm-3">User ID:</dt>
-        <dd class="col-sm-9">@Model.UserId</dd>
+    <div class="profile-header">
+        <div class="profile-actions">
+            <a href="/Profile/EditProfile" class="edit-profile-button">Edit Profile</a>
+        </div>
+    </div>
+    <div class="profile-details">
+        <div class="profile-section">
+            <h2>Personal Information</h2>
+            <dl class="row">
+                <dt class="col-sm-3">Username:</dt>
+                <dd class="col-sm-9">@Model.UserName</dd>
+            </dl>
+            <dl class="row">
+                <dt class="col-sm-3">Full Name:</dt>
+                <dd class="col-sm-9">@Model.FullName</dd>
+            </dl>
+        </div>
+        <div class="profile-section">
+            <h2>Contact Details</h2>
+            <dl class="row">
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">
+                    @(Model.Email != null ? Model.Email : "Not provided")
+                </dd>
 
-        <dt class="col-sm-3">Username:</dt>
-        <dd class="col-sm-9">@Model.UserName</dd>
+                <dt class="col-sm-3">Phone:</dt>
+                <dd class="col-sm-9">
+                    @(Model.Phone != null ? Model.Phone : "Not provided")
+                </dd>
 
-        <dt class="col-sm-3">Email:</dt>
-        <dd class="col-sm-9">
-            @(Model.Email != null ? Model.Email : "Not provided")
-        </dd>
-
-        <dt class="col-sm-3">Phone:</dt>
-        <dd class="col-sm-9">
-            @(Model.Phone != null ? Model.Phone : "Not provided")
-        </dd>
-
-        <dt class="col-sm-3">Address:</dt>
-        <dd class="col-sm-9">
-            @(Model.Address != null ? Model.Address : "Not provided")
-        </dd>
-
-        <dt class="col-sm-3">Date of Birth:</dt>
-        <dd class="col-sm-9">
-            @(Model.DOB.HasValue ? Model.DOB.Value.ToString("d") : "Not provided")
-        </dd>
-    </dl>
+                <dt class="col-sm-3">Address:</dt>
+                <dd class="col-sm-9">
+                    @(Model.Address != null ? Model.Address : "Not provided")
+                </dd>
+            </dl>
+        </div>
+        <div class="profile-section">
+            <h2>Other Information</h2>
+            <dl class="row">
+                <dt class="col-sm-3">Date Of Birth:</dt>
+                <dd class="col-sm-9">
+                    @(Model.DOB != null ? Model.DOB.Value.ToString("dddd, dd MMMM yyyy") : "Not provided")
+                </dd>
+            </dl>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -45,15 +64,49 @@
         background-color: #f9f9f9;
     }
 
-        .profile-container dl {
+    .profile-header {
+        float: right;
+    }
+
+    .profile-picture img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .edit-profile-button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .profile-section {
+        margin-bottom: 20px;
+    }
+
+        .profile-section h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .profile-section dl {
             margin: 0;
         }
 
-        .profile-container dt {
+        .profile-section dt {
             font-weight: bold;
         }
 
-        .profile-container dd {
+        .profile-section dd {
             margin-bottom: 10px;
         }
+
+    .profile-actions a {
+        text-decoration: none !important;
+    }
 </style>

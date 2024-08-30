@@ -49,7 +49,8 @@ namespace UserService.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.UserData, user.UserId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,

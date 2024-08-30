@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using UserService.Models;
+using UserService.Services;
 
 namespace UserService.Controllers
 {
@@ -9,16 +10,20 @@ namespace UserService.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly ILogger<UsersController> _logger;
         private readonly UserServiceContext _context;
+        private readonly IAuthService _authService;
 
-        public UsersController(UserServiceContext context)
+        public UsersController(ILogger<UsersController> logger, UserServiceContext context, IAuthService authService)
         {
+            _logger = logger;
             _context = context;
+            _authService = authService;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetPost()
+        public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
             if (_context.User == null)
             {
@@ -31,6 +36,17 @@ namespace UserService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            _logger.LogInformation($"In the GetUser(HttpGet) method: {token}.");
+
+            var claimsPrincipal = _authService.ValidateJwtToken(token);
+
+            if (claimsPrincipal == null)
+            {
+                return Unauthorized();
+            }
+
             if (_context.User == null)
             {
                 return NotFound();
@@ -49,6 +65,17 @@ namespace UserService.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            _logger.LogInformation($"In the PutUser(HttpPut) method: {token}.");
+
+            var claimsPrincipal = _authService.ValidateJwtToken(token);
+
+            if (claimsPrincipal == null)
+            {
+                return Unauthorized();
+            }
+
             if (id != user.UserId)
             {
                 return BadRequest();
@@ -97,6 +124,7 @@ namespace UserService.Controllers
             {
                 return NotFound();
             }
+
             var user = await _context.User.FindAsync(id);
             if (user == null)
             {

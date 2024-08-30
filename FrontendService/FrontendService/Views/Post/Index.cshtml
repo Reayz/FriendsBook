@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+}
+
+@model List<PostDTO>
+
+<div class="container">
+    <div class="text-center">
+        <h1 class="display-4">Friends Book</h1>
+        <p>Connect with your friends</p>
+    </div>
+
+    <div class="whats-new-block p-4 my-4 text-center text-white rounded" style="background: linear-gradient(135deg, #ff5f6d, #ffc371);">
+        <div class="d-flex align-items-center justify-content-center mb-3">
+            <i class="fas fa-lightbulb fa-2x mr-2"></i>
+            <h2 class="mb-0">What's New?</h2>
+        </div>
+        <p class="lead">Have something exciting to share? Let your voice be heard by adding a new post!</p>
+        <a href="/Post/Create" class="btn btn-outline-light btn-lg mt-3">Add Your Post <i class="fas fa-arrow-right ml-2"></i></a>
+    </div>
+
+    @foreach (var post in Model)
+    {
+        <div class="card my-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>@post.Title</h2>
+                </div>
+                <div>
+                    <a href="/Post/Edit/@post.PostId" class="btn btn-success btn-sm">Edit</a>
+                    <button type="button" class="btn btn-danger btn-sm" data-post-id="@post.PostId">Delete</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>@post.Description</p>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">Author: @post.AuthorName</span>
+                    <span>Published @GetTimeAgo(post.PublishDate)</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the post?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var postIdToDelete;
+
+            $('.btn-danger[data-post-id]').on('click', function () {
+                postIdToDelete = $(this).data('post-id');
+                $('#deleteModal').modal('show');
+            });
+
+            $('.btn-secondary, .close').on('click', function () {
+                $('#deleteModal').modal('hide');
+            });
+
+            $('#confirmDelete').on('click', function () {
+                $.ajax({
+                    url: '/Post/Delete/' + postIdToDelete,
+                    type: 'POST',
+                    success: function (result) {
+                        location.reload(); // Reload the page after deletion
+                    },
+                    error: function (err) {
+                        alert('Error deleting the post.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+@functions {
+    public string GetTimeAgo(DateTime publishDate)
+    {
+        var timeSpan = DateTime.UtcNow - publishDate;
+
+        if (timeSpan.TotalMinutes < 1)
+            return "Just now";
+        if (timeSpan.TotalMinutes < 60)
+            return $"{timeSpan.Minutes} min ago";
+        if (timeSpan.TotalHours < 24)
+            return $"{timeSpan.Hours} hr ago";
+        if (timeSpan.TotalDays < 7)
+            return $"{timeSpan.Days} days ago";
+
+        return publishDate.ToString("MMMM dd, yyyy");
+    }
+}
