@@ -6,10 +6,12 @@ namespace FrontendService.Controllers
 {
     public class PostController : Controller
     {
+        private readonly ILogger<PostController> _logger;
         private readonly IBackendServiceClient _postServiceClient;
 
-        public PostController(IBackendServiceClient backendServiceClient)
+        public PostController(ILogger<PostController> logger, IBackendServiceClient backendServiceClient)
         {
+            _logger = logger;
             _postServiceClient = backendServiceClient;
         }
 
@@ -28,6 +30,7 @@ namespace FrontendService.Controllers
             }
             else
             {
+                _logger.LogInformation("Getting Posts from Post service is not successfull. Redirecting to the Login page.");
                 return RedirectToAction("Index", "Login");
             }
         }

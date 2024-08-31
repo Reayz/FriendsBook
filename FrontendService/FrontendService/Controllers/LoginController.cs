@@ -9,11 +9,13 @@ namespace FrontendService.Controllers
 {
     public class LoginController : Controller
     {
+        private readonly ILogger<LoginController> _logger;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 
-        public LoginController(HttpClient httpClient, IConfiguration configuration)
+        public LoginController(ILogger<LoginController> logger, HttpClient httpClient, IConfiguration configuration)
         {
+            _logger = logger;
             _httpClient = httpClient;
             _configuration = configuration;
         }
@@ -71,10 +73,19 @@ namespace FrontendService.Controllers
                             Response.Cookies.Append("UserName", model.Username, cookieOptions);
                             Response.Cookies.Append("UserId", userId, cookieOptions);
 
-                            return RedirectToAction("Index", "Home");
+                            _logger.LogInformation("Token, UserName, UserId successfully added to the cookies.");
+                            return RedirectToAction("Index", "Post");
                         }
                     }
                 }
+                else
+                {
+                    _logger.LogInformation($"Response from Auth/UserService is not success. Status code: {response.StatusCode}.");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("ModelState is not valid for login.");
             }
 
             return RedirectToAction("Index");
@@ -108,7 +119,7 @@ namespace FrontendService.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Index", "Home"); // Token is valid
+                    return RedirectToAction("Index", "Post"); // Token is valid
                 }
             }
             catch (Exception ex)
@@ -138,8 +149,6 @@ namespace FrontendService.Controllers
                 var response = await _httpClient.PostAsync(requestUrl, content);
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response Status Code: " + response.StatusCode);
-                Console.WriteLine("Response Body: " + responseContent);
 
                 if (response.IsSuccessStatusCode)
                 {

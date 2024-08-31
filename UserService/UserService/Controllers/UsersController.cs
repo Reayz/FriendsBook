@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using UserService.Data;
 using UserService.Models;
 using UserService.Services;
@@ -13,12 +14,14 @@ namespace UserService.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly UserServiceContext _context;
         private readonly IAuthService _authService;
+        private readonly IRabbitMQSenderService _rabbitMQSenderService;
 
-        public UsersController(ILogger<UsersController> logger, UserServiceContext context, IAuthService authService)
+        public UsersController(ILogger<UsersController> logger, UserServiceContext context, IAuthService authService, IRabbitMQSenderService rabbitMQSenderService)
         {
             _logger = logger;
             _context = context;
             _authService = authService;
+            _rabbitMQSenderService = rabbitMQSenderService;
         }
 
         // GET: api/Users
@@ -86,6 +89,15 @@ namespace UserService.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                var data = JsonSerializer.Serialize(new
+                {
+                    Type = "UserUpdate",
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                });
+
+                _rabbitMQSenderService.SendMessage(data);
             }
             catch (DbUpdateConcurrencyException)
             {

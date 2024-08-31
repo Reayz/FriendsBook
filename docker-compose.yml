@@ -1,6 +1,32 @@
 version: '3.8'
 
 services:
+  sql_server:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sql_server
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Enosis123!
+    volumes:
+      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/data:/var/opt/mssql/data"
+      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/log:/var/opt/mssql/log"
+      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/secrets:/var/opt/mssql/secrets"
+    networks:
+      - my_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "8080:15672"
+      - "5672:5672"
+    volumes:
+      - "D:/PersonalProjects/FriendsBook/RabbitMQVolumes/Vol 1/data:/var/lib/rabbitmq"
+    networks:
+      - my_network
+
   userservice:
     build:
       context: ./UserService
@@ -17,6 +43,7 @@ services:
       - ./UserService/logs:/app/logs
     depends_on:
       - sql_server
+      - rabbitmq
     networks:
       - my_network
 
@@ -26,9 +53,10 @@ services:
       dockerfile: Dockerfile
     image: postservice
     container_name: friendsbook.postservice
+    restart: always
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "9080:80"
+      - "9443:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings:PostDB=Server=sql_server;Database=PostDB;Encrypt=False;User Id=sa;Password=Enosis123!;
@@ -37,6 +65,7 @@ services:
       - ./PostService/logs:/app/logs
     depends_on:
       - sql_server
+      - rabbitmq
       - userservice
     networks:
       - my_network
@@ -58,24 +87,8 @@ services:
     volumes:
       - ./FrontendService/logs:/app/logs
     depends_on:
-      - sql_server
       - userservice
       - postservice
-    networks:
-      - my_network
-
-  sql_server:
-    image: mcr.microsoft.com/mssql/server
-    container_name: sql_server
-    ports:
-      - "1433:1433"
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Enosis123!
-    volumes:
-      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/data:/var/opt/mssql/data"
-      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/log:/var/opt/mssql/log"
-      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/secrets:/var/opt/mssql/secrets"
     networks:
       - my_network
 

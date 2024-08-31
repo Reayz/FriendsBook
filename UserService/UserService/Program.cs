@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRabbitMQSenderService, RabbitMQSenderService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

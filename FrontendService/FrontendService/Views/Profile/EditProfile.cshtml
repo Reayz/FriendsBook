@@ -8,10 +8,9 @@
     <h1 class="edit-profile-title">Edit Profile</h1>
     <form asp-action="EditProfile" method="post" class="edit-profile-form">
         <input type="hidden" asp-for="UserId" />
-        <input type="hidden" asp-for="UserName" />
         <div class="form-group">
             <label asp-for="UserName" class="form-label"></label>
-            <input asp-for="UserName" class="form-control" placeholder="Enter your username" disabled />
+            <input asp-for="UserName" class="form-control" placeholder="Enter your username" />
             <span asp-validation-for="UserName" class="text-danger"></span>
         </div>
         <div class="form-group">

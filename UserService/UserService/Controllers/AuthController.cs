@@ -29,9 +29,11 @@ namespace UserService.Controllers
 
             if (token == null)
             {
+                _logger.LogInformation($"Authentication is not succesfull in the Login method.");
                 return Unauthorized();
             }
 
+            _logger.LogInformation($"Authentication is succesfull in the Login method.");
             return Ok(new { Token = token });
         }
 

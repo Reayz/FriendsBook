@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PostService.Data;
+using PostService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PostServiceContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PostDB")));
@@ -7,6 +8,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+
+// Register RabbitMQReceiverService as a background service
+builder.Services.AddHostedService<RabbitMQReceiverService>();
 
 
 var app = builder.Build();
