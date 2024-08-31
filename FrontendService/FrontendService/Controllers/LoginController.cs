@@ -12,6 +12,7 @@ namespace FrontendService.Controllers
         private readonly ILogger<LoginController> _logger;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private static string ViewDataMsg = string.Empty;
 
         public LoginController(ILogger<LoginController> logger, HttpClient httpClient, IConfiguration configuration)
         {
@@ -22,6 +23,7 @@ namespace FrontendService.Controllers
 
         public IActionResult Index()
         {
+            ViewData["ErrorMsg"] = ViewDataMsg;
             return View();
         }
 
@@ -73,6 +75,7 @@ namespace FrontendService.Controllers
                             Response.Cookies.Append("UserName", model.Username, cookieOptions);
                             Response.Cookies.Append("UserId", userId, cookieOptions);
 
+                            ViewDataMsg = "";
                             _logger.LogInformation("Token, UserName, UserId successfully added to the cookies.");
                             return RedirectToAction("Index", "Post");
                         }
@@ -88,6 +91,7 @@ namespace FrontendService.Controllers
                 _logger.LogInformation("ModelState is not valid for login.");
             }
 
+            ViewDataMsg = "Wrong credentials, Please try again.";
             return RedirectToAction("Index");
         }
 
