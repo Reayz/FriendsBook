@@ -1,5 +1,5 @@
 # FriendsBook
-A Social platform like FaceBook
+A Microservice application as a social platform like Facebook
 
 ---
 This is a microservice application. There are following services:
