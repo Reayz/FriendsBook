@@ -26,6 +26,7 @@ namespace FrontendService.Services
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
 
+            _httpClient.BaseAddress = new Uri(_configuration["ApplicationUrl"]);
             var token = _httpContextAccessor.HttpContext?.Request.Cookies["Token"];
             if (!string.IsNullOrEmpty(token))
             {
@@ -35,11 +36,9 @@ namespace FrontendService.Services
 
         public async Task<List<PostDTO>> GetAllPostsFromPostService(string token)
         {
-            var url = _configuration["MicroServiceUrls:PostServiceUrl"];
-
             try
             {
-                var response = await _httpClient.GetAsync(url + "api/Posts");
+                var response = await _httpClient.GetAsync("api/Posts");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -55,7 +54,7 @@ namespace FrontendService.Services
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return null;
@@ -63,11 +62,9 @@ namespace FrontendService.Services
 
         public async Task<PostDTO> GetPostDetails(int postId)
         {
-            var url = _configuration["MicroServiceUrls:PostServiceUrl"];
-
             try
             {
-                var response = await _httpClient.GetAsync(url + "api/Posts/" + postId);
+                var response = await _httpClient.GetAsync("api/Posts/" + postId);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -83,7 +80,7 @@ namespace FrontendService.Services
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return null;
@@ -91,18 +88,17 @@ namespace FrontendService.Services
 
         public async Task<bool> UpdatePostDetails(PostDTO post)
         {
-            var url = _configuration["MicroServiceUrls:PostServiceUrl"];
             try
             {
                 var content = new StringContent(JsonSerializer.Serialize(post), Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync(url + "api/Posts/" + post.PostId, content);
+                var response = await _httpClient.PutAsync("api/Posts/" + post.PostId, content);
 
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return false;
@@ -110,16 +106,15 @@ namespace FrontendService.Services
 
         public async Task<bool> DeletePost(int postId)
         {
-            var url = _configuration["MicroServiceUrls:PostServiceUrl"];
             try
             {
-                var response = await _httpClient.DeleteAsync(url + "api/Posts/" + postId);
+                var response = await _httpClient.DeleteAsync("api/Posts/" + postId);
 
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return false;
@@ -127,12 +122,10 @@ namespace FrontendService.Services
 
         public async Task<PostDTO> CreatePost(PostDTO post)
         {
-            var url = _configuration["MicroServiceUrls:PostServiceUrl"];
-
             try
             {
                 var content = new StringContent(JsonSerializer.Serialize(post), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(url + "api/Posts", content);
+                var response = await _httpClient.PostAsync("api/Posts", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -149,7 +142,7 @@ namespace FrontendService.Services
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return null;

@@ -82,8 +82,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings:PostDB=Server=sql_server;Database=PostDB;Encrypt=False;User Id=sa;Password=Enosis123!;
-      - MicroServiceUrls:UserServiceUrl=http://userservice:80/
-      - MicroServiceUrls:PostServiceUrl=http://postservice:80/
+      - ApplicationUrl=http://frontendservice:80/
     volumes:
       - ./FrontendService/logs:/app/logs
     depends_on:

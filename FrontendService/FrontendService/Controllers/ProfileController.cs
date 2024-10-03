@@ -18,6 +18,7 @@ namespace FrontendService.Controllers
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
 
+            _httpClient.BaseAddress = new Uri(_configuration["ApplicationUrl"]);
             var token = _httpContextAccessor.HttpContext?.Request.Cookies["Token"];
             if (!string.IsNullOrEmpty(token))
             {
@@ -27,12 +28,10 @@ namespace FrontendService.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userId = int.Parse(Request.Cookies["UserId"]);
-            var url = _configuration["MicroServiceUrls:UserServiceUrl"];
-
             try
             {
-                var response = await _httpClient.GetAsync(url + "api/Users/" + userId);
+                var userId = int.Parse(Request.Cookies["UserId"]);
+                var response = await _httpClient.GetAsync("api/Users/" + userId);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -49,7 +48,7 @@ namespace FrontendService.Controllers
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return RedirectToAction("Index", "Login");
@@ -58,12 +57,10 @@ namespace FrontendService.Controllers
         [HttpGet]
         public async Task<IActionResult> EditProfile()
         {
-            var userId = int.Parse(Request.Cookies["UserId"]);
-            var url = _configuration["MicroServiceUrls:UserServiceUrl"];
-
             try
             {
-                var response = await _httpClient.GetAsync(url + "api/Users/" + userId);
+                var userId = int.Parse(Request.Cookies["UserId"]);
+                var response = await _httpClient.GetAsync("api/Users/" + userId);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -80,7 +77,7 @@ namespace FrontendService.Controllers
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return RedirectToAction("Index", "Login");
@@ -94,12 +91,10 @@ namespace FrontendService.Controllers
                 return View(userDto);
             }
 
-            var url = _configuration["MicroServiceUrls:UserServiceUrl"];
-
             try
             {
                 var content = new StringContent(JsonSerializer.Serialize(userDto), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync(url + "api/Users/" + userDto.UserId, content);
+                var response = await _httpClient.PutAsync("api/Users/" + userDto.UserId, content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -108,7 +103,7 @@ namespace FrontendService.Controllers
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("Exception: " + ex.Message);
             }
 
             return RedirectToAction("Index", "Login");

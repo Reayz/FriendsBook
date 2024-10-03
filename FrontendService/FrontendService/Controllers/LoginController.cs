@@ -19,6 +19,7 @@ namespace FrontendService.Controllers
             _logger = logger;
             _httpClient = httpClient;
             _configuration = configuration;
+            _httpClient.BaseAddress = new Uri(_configuration["ApplicationUrl"]);
         }
 
         public IActionResult Index()
@@ -39,51 +40,67 @@ namespace FrontendService.Controllers
                     model.Password,
                 };
 
-                var content = new StringContent(JsonSerializer.Serialize(loginData), Encoding.UTF8, "application/json");
-
-                var url = _configuration["MicroServiceUrls:UserServiceUrl"];
-
-                var response = await _httpClient.PostAsync(url + "api/Auth/login", content);
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    var responseData = await response.Content.ReadAsStringAsync();
+                    var content = new StringContent(JsonSerializer.Serialize(loginData), Encoding.UTF8, "application/json");
 
-                    var options = new JsonSerializerOptions
+                    var requestUrl = $"api/Auth/login";
+
+                    var response = await _httpClient.PostAsync(requestUrl, content);
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        PropertyNameCaseInsensitive = true
-                    };
+                        _logger.LogInformation("Response from Auth/UserService is success.");
+                        var responseData = await response.Content.ReadAsStringAsync();
 
-                    var token = JsonSerializer.Deserialize<TokenResponse>(responseData, options);
-                    if (token != null)
-                    {
-                        var handler = new JwtSecurityTokenHandler();
-                        var jsonToken = handler.ReadToken(token.Token) as JwtSecurityToken;
-
-                        if (jsonToken != null)
+                        var options = new JsonSerializerOptions
                         {
-                            var claims = jsonToken.Claims;
+                            PropertyNameCaseInsensitive = true
+                        };
 
-                            var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.UserData)?.Value;
+                        var token = JsonSerializer.Deserialize<TokenResponse>(responseData, options);
+                        if (token != null)
+                        {
+                            var handler = new JwtSecurityTokenHandler();
+                            var jsonToken = handler.ReadToken(token.Token) as JwtSecurityToken;
 
-                            var cookieOptions = new CookieOptions
+                            if (jsonToken != null)
                             {
-                                Expires = DateTimeOffset.UtcNow.AddDays(1)
-                            };
+                                var claims = jsonToken.Claims;
 
-                            Response.Cookies.Append("Token", token.Token, cookieOptions);
-                            Response.Cookies.Append("UserName", model.Username, cookieOptions);
-                            Response.Cookies.Append("UserId", userId, cookieOptions);
+                                var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.UserData)?.Value;
 
-                            ViewDataMsg = "";
-                            _logger.LogInformation("Token, UserName, UserId successfully added to the cookies.");
-                            return RedirectToAction("Index", "Post");
+                                var cookieOptions = new CookieOptions
+                                {
+                                    Expires = DateTimeOffset.UtcNow.AddDays(1)
+                                };
+
+                                Response.Cookies.Append("Token", token.Token, cookieOptions);
+                                Response.Cookies.Append("UserName", model.Username, cookieOptions);
+                                Response.Cookies.Append("UserId", userId, cookieOptions);
+
+                                ViewDataMsg = "";
+                                _logger.LogInformation("Token, UserName, UserId successfully added to the cookies.");
+                                return RedirectToAction("Index", "Post");
+                            }
+                            else
+                            {
+                                _logger.LogInformation("jsonToken is null.");
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Token is null.");
                         }
                     }
+                    else
+                    {
+                        _logger.LogInformation($"Response from Auth/UserService is not success. Status code: {response.StatusCode}.");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogInformation($"Response from Auth/UserService is not success. Status code: {response.StatusCode}.");
+                    Console.WriteLine("Exception: " + ex.Message);
                 }
             }
             else
@@ -104,17 +121,11 @@ namespace FrontendService.Controllers
                 return RedirectToAction("Index");
             }
 
-            var url = _configuration["MicroServiceUrls:UserServiceUrl"];
-            var requestUrl = $"{url}api/Auth/verify-token?token={Uri.EscapeDataString(token)}";
-
-            Console.WriteLine("Request URL: " + requestUrl);
-
-            var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-
-            request.Content = new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-
             try
             {
+                var requestUrl = $"api/Auth/verify-token?token={Uri.EscapeDataString(token)}";
+                var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
                 var response = await _httpClient.SendAsync(request);
 
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -143,13 +154,10 @@ namespace FrontendService.Controllers
                 return RedirectToAction("Index");
             }
 
-            var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-
-            var url = _configuration["MicroServiceUrls:UserServiceUrl"];
-            var requestUrl = $"{url}api/Auth/logout?token={Uri.EscapeDataString(token)}";
-
             try
             {
+                var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+                var requestUrl = $"api/Auth/logout?token={Uri.EscapeDataString(token)}";
                 var response = await _httpClient.PostAsync(requestUrl, content);
 
                 var responseContent = await response.Content.ReadAsStringAsync();
