@@ -2,14 +2,14 @@
 A Microservice application as a social platform like Facebook
 
 ---
-This is a microservice application. There are following services:
-1. Froentend Service - Full frontend part for whole application(Usasally there should be multiple frontend service)
+This is a microservice application. There are the following services:
+1. Frontend Service - Full frontend part for the whole application(Usually there should be multiple frontend services)
 2. Post Service - Add/Update/Delete posts
-3. User Service - Authenticaion and user profile
+3. User Service - Authentication and user profile
 4. Attachment Service - Add/Remove images
 
 ---
-There has also muliple databases:
+There has also multiple databases:
 1. UserDB - User information
 2. PostDB - Post related information
 
@@ -20,3 +20,4 @@ Uses following technologies:
 3. MS SQL Server 2022
 4. Docker - All services are running into docker container
 5. RabbitMQ - Any changes to the User information will update to the PostDB
+6. YARP - Reverse Proxy for service path forwarding
