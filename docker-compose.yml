@@ -10,9 +10,9 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Enosis123!
     volumes:
-      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/data:/var/opt/mssql/data"
-      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/log:/var/opt/mssql/log"
-      - "D:/PersonalProjects/FriendsBook/MSSqlVolumes/Vol 1/secrets:/var/opt/mssql/secrets"
+      - "D:/PersonalProjects/FriendsBook/Volumes/MSSqlVolumes/Vol 1/data:/var/opt/mssql/data"
+      - "D:/PersonalProjects/FriendsBook/Volumes/MSSqlVolumes/Vol 1/log:/var/opt/mssql/log"
+      - "D:/PersonalProjects/FriendsBook/Volumes/MSSqlVolumes/Vol 1/secrets:/var/opt/mssql/secrets"
     networks:
       - my_network
 
@@ -23,7 +23,7 @@ services:
       - "8080:15672"
       - "5672:5672"
     volumes:
-      - "D:/PersonalProjects/FriendsBook/RabbitMQVolumes/Vol 1/data:/var/lib/rabbitmq"
+      - "D:/PersonalProjects/FriendsBook/Volumes/RabbitMQVolumes/Vol 1/data:/var/lib/rabbitmq"
     networks:
       - my_network
 
@@ -88,6 +88,34 @@ services:
     depends_on:
       - userservice
       - postservice
+    networks:
+      - my_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - "D:/PersonalProjects/FriendsBook/Volumes/PrometheusVolumes:/prometheus"
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - my_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    volumes:
+      - "D:/PersonalProjects/FriendsBook/Volumes/GrafanaVolumes/grafana_data:/var/lib/grafana"
     networks:
       - my_network
 

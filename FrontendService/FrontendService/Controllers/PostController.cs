@@ -30,7 +30,7 @@ namespace FrontendService.Controllers
             }
             else
             {
-                _logger.LogInformation("Getting Posts from Post service is not successfull. Redirecting to the Login page.");
+                _logger.LogWarning("Getting Posts from Post service is not successfull. Redirecting to the Login page.");
                 return RedirectToAction("Index", "Login");
             }
         }

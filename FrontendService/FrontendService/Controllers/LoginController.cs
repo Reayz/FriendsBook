@@ -50,7 +50,7 @@ namespace FrontendService.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        _logger.LogInformation("Response from Auth/UserService is success.");
+                        _logger.LogWarning("Response from Auth/UserService is success.");
                         var responseData = await response.Content.ReadAsStringAsync();
 
                         var options = new JsonSerializerOptions
@@ -80,22 +80,22 @@ namespace FrontendService.Controllers
                                 Response.Cookies.Append("UserId", userId, cookieOptions);
 
                                 ViewDataMsg = "";
-                                _logger.LogInformation("Token, UserName, UserId successfully added to the cookies.");
+                                _logger.LogWarning("Token, UserName, UserId successfully added to the cookies.");
                                 return RedirectToAction("Index", "Post");
                             }
                             else
                             {
-                                _logger.LogInformation("jsonToken is null.");
+                                _logger.LogWarning("jsonToken is null.");
                             }
                         }
                         else
                         {
-                            _logger.LogInformation("Token is null.");
+                            _logger.LogWarning("Token is null.");
                         }
                     }
                     else
                     {
-                        _logger.LogInformation($"Response from Auth/UserService is not success. Status code: {response.StatusCode}.");
+                        _logger.LogWarning($"Response from Auth/UserService is not success. Status code: {response.StatusCode}.");
                     }
                 }
                 catch (Exception ex)
@@ -105,7 +105,7 @@ namespace FrontendService.Controllers
             }
             else
             {
-                _logger.LogInformation("ModelState is not valid for login.");
+                _logger.LogWarning("ModelState is not valid for login.");
             }
 
             ViewDataMsg = "Wrong credentials, Please try again.";

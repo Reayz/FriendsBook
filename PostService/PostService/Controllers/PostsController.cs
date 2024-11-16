@@ -27,7 +27,7 @@ namespace PostService.Controllers
         public async Task<ActionResult<IEnumerable<Post>>> GetPost()
         {
             var isValid = await ValidToken();
-            _logger.LogInformation($"Value of isValid in the GetPost method: {isValid}.");
+            _logger.LogWarning($"Value of isValid in the GetPost method: {isValid}.");
             if (isValid)
             {
                 if (_context.Post == null)
@@ -158,7 +158,7 @@ namespace PostService.Controllers
         private async Task<bool> ValidToken()
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            _logger.LogInformation($"Token in the ValidToken method: {token}.");
+            _logger.LogWarning($"Token in the ValidToken method: {token}.");
 
             if (string.IsNullOrEmpty(token))
             {

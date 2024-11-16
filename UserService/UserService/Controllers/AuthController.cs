@@ -29,11 +29,11 @@ namespace UserService.Controllers
 
             if (token == null)
             {
-                _logger.LogInformation($"Authentication is not succesfull in the Login method.");
+                _logger.LogWarning($"Authentication is not succesfull in the Login method.");
                 return Unauthorized();
             }
 
-            _logger.LogInformation($"Authentication is succesfull in the Login method.");
+            _logger.LogWarning($"Authentication is succesfull in the Login method.");
             return Ok(new { Token = token });
         }
 
@@ -41,7 +41,7 @@ namespace UserService.Controllers
         public IActionResult VerifyToken(string token)
         {
             var claimsPrincipal = _authService.ValidateJwtToken(token);
-            _logger.LogInformation($"In the VerifyToken method: {claimsPrincipal?.Identity?.Name}.");
+            _logger.LogWarning($"In the VerifyToken method: {claimsPrincipal?.Identity?.Name}.");
 
             if (claimsPrincipal == null)
             {

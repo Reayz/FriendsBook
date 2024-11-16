@@ -41,7 +41,7 @@ namespace UserService.Controllers
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            _logger.LogInformation($"In the GetUser(HttpGet) method: {token}.");
+            _logger.LogWarning($"In the GetUser(HttpGet) method: {token}.");
 
             var claimsPrincipal = _authService.ValidateJwtToken(token);
 
@@ -70,7 +70,7 @@ namespace UserService.Controllers
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            _logger.LogInformation($"In the PutUser(HttpPut) method: {token}.");
+            _logger.LogWarning($"In the PutUser(HttpPut) method: {token}.");
 
             var claimsPrincipal = _authService.ValidateJwtToken(token);
 

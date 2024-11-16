@@ -1,6 +1,15 @@
 using FrontendService.Services;
+using Prometheus;
+using Serilog;
+
+// Configure Serilog
+var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Replace default logging with Serilog
+builder.Host.UseSerilog();
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
@@ -12,6 +21,10 @@ builder.Services.AddScoped<IBackendServiceClient, BackendServiceClient>();
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 var app = builder.Build();
+
+// Add Prometheus metrics endpoint
+app.UseHttpMetrics(); // Collect HTTP metrics like request count, duration, etc.
+app.MapMetrics("/metrics"); // Expose metrics at /metrics endpoint
 
 if (!app.Environment.IsDevelopment())
 {
@@ -34,4 +47,16 @@ app.MapControllerRoute(
 // Map YARP reverse proxy
 app.MapReverseProxy();
 
-app.Run();
+try
+{
+    Log.Information("Starting the application...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application start-up failed!");
+}
+finally
+{
+    Log.CloseAndFlush(); // Ensure all logs are flushed on shutdown
+}

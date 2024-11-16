@@ -48,7 +48,7 @@ namespace PostService.Services
                     };
 
                     var data = JsonSerializer.Deserialize<RabbitMQResponse>(message, options);
-                    _logger.LogInformation($"Received message: {message}");
+                    _logger.LogWarning($"Received message: {message}");
 
                     if (data != null && data.Type == "UserUpdate")
                     {
@@ -60,7 +60,7 @@ namespace PostService.Services
                                 post.AuthorName = data.UserName;
                             }
                             await context.SaveChangesAsync();
-                            _logger.LogInformation("Database updated successfully.");
+                            _logger.LogWarning("Database updated successfully.");
                         }
                         else
                         {
@@ -77,9 +77,9 @@ namespace PostService.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("RabbitMQReceiverService is starting.");
+            _logger.LogWarning("RabbitMQReceiverService is starting.");
 
-            stoppingToken.Register(() => _logger.LogInformation("RabbitMQReceiverService is stopping."));
+            stoppingToken.Register(() => _logger.LogWarning("RabbitMQReceiverService is stopping."));
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -88,7 +88,7 @@ namespace PostService.Services
                 await Task.Delay(1000, stoppingToken); // Delay to prevent a tight loop
             }
 
-            _logger.LogInformation("RabbitMQReceiverService has stopped.");
+            _logger.LogWarning("RabbitMQReceiverService has stopped.");
         }
 
 
